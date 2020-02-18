@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2019-2020, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -58,7 +58,7 @@ struct fsm_tti_intr_drv {
 	struct cdev cdev;
 	bool is_poll_enabled;
 	bool is_seeding_done;
-	bool is_tti_updated;
+	atomic_t tti_updated;
 	bool is_first_tti_intr;
 	wait_queue_head_t tti_poll_waitqueue;
 	struct fsm_tti_gpio_device_data *device_data;

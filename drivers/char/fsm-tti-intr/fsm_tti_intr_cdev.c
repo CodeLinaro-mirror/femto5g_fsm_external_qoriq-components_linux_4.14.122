@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2019-2020, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -30,7 +30,7 @@ static int fsm_tti_intr_cdev_close(
 		return -ENOMEM;
 	}
 
-	tti_drv_cntx->is_tti_updated = false;
+	atomic_set(&tti_drv_cntx->tti_updated, 0);
 	tti_drv_cntx->is_poll_enabled = false;
 	return 0;
 }
@@ -107,17 +107,15 @@ static unsigned int fsm_tti_intr_cdev_poll(
 	unsigned int mask = 0;
 	struct fsm_tti_intr_drv *tti_drv_cntx =
 		(struct fsm_tti_intr_drv *)file->private_data;
-
 	if (!tti_drv_cntx->is_poll_enabled)
 		tti_drv_cntx->is_poll_enabled = true;
 
 	poll_wait(file, &tti_drv_cntx->tti_poll_waitqueue, wait);
 
 	/* check wait is interrupted by interrupt handler only */
-	if (tti_drv_cntx->is_tti_updated == true) {
-		tti_drv_cntx->is_tti_updated = false;
+	if (atomic_sub_and_test(1, &tti_drv_cntx->tti_updated ))
 		mask = POLLIN;
-	}
+
 	return mask;
 }
 

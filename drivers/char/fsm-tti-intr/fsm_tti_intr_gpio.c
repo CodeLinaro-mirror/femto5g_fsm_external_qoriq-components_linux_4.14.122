@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2019-2020, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -60,7 +60,7 @@ static irqreturn_t fsm_tti_gpio_irq_handler(int irq, void *irq_data)
 
 		/* wake up the poll ops */
 		if (tti_intr_drv->is_poll_enabled) {
-			tti_intr_drv->is_tti_updated = true;
+			atomic_set(&tti_intr_drv->tti_updated, 1);
 			wake_up(&tti_intr_drv->tti_poll_waitqueue);
 		}
 	}
@@ -200,7 +200,7 @@ static int __init fsm_tti_intr_probe(struct platform_device *pdev)
 	/* initialize wait queue */
 	init_waitqueue_head(&tti_intr_drv->tti_poll_waitqueue);
 	/* initialize the flags */
-	tti_intr_drv->is_tti_updated = false;
+	atomic_set(&tti_intr_drv->tti_updated, 0);
 	tti_intr_drv->is_seeding_done = false;
 	tti_intr_drv->is_poll_enabled = false;
 	tti_intr_drv->is_first_tti_intr = false;
